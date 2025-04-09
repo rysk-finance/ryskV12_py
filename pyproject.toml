@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "ryskv12-py"
+version = "0.1.0"
+description = "Python sdk to interact with Rysk v12"
+authors = ["thundering-silence <25010047+thundering-silence@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
