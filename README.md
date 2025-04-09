@@ -9,7 +9,6 @@ Python wrapper for ryskv12-cli
     ```bash
     poetry install
     ```
-    You will also need the `models.py` file containing the definitions for `JSONRPCResponse`, `JSONResponseHandler`, `Quote`, and `Transfer`.
 3.  **Download the `ryskV12` CLI:** Navigate to [https://github.com/rysk-finance/ryskV12-cli/releases](https://github.com/rysk-finance/ryskV12-cli/releases) and download the latest release into the same directory where you will be using this SDK, naming it `ryskV12`. Ensure it has execute permissions.
 
 ## Run
