@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 from enum import Enum
-import json
 import subprocess
-import shlex
 import sys
-import time
+from typing import Any, Callable, List
 
-from models import JSONRPCResponse, JSONResponseHandler, Quote, Transfer
+from models import Quote, Transfer
+
 
 class Env(Enum):
     LOCAL = 0
@@ -43,171 +42,100 @@ class Rysk:
     def _url(self, uri: str) -> str:
         return f"{ENV_CONFIGS.get(self._env).base_url}{uri}"
 
-    def connect(self, channel_id: str, uri: str, handler: JSONResponseHandler):
-        """
-        Instantiate a new websocket connection with a given id.
-        """
-        try:
-            command = shlex.split(
-                f"{self._cli_path} connect --channel_id {channel_id} --url {self._url(uri)}"
+    def execute(
+        self,
+        args: List[str] = [],
+        on_message: Callable[[str], Any] = print,
+        on_error: Callable[[str], Any] = lambda err: print(err, file=sys.stderr),
+        on_close: Callable[[int], Any] = print,
+    ) -> None:
+        process = subprocess.Popen(
+            [self._cli_path, *args],
+            shell=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+        if process.stdout:
+            for line in process.stdout:
+                on_message(line.strip())
+
+        if process.stderr:
+            for line in process.stderr:
+                on_message(line.strip())
+
+        returncode = process.wait()
+        on_close(returncode)
+        if returncode != 0:
+            on_error(
+                subprocess.CalledProcessError(returncode, [self._cli_path, *args])
             )
-            process = subprocess.Popen(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-            )
 
-            if process.stdout:
-                while True:
-                    line = process.stdout.readline().strip()
-                    if not line:
-                        if process.poll() is not None:
-                            break
-                        time.sleep(0.1)
-                        continue
-                    try:
-                        res: JSONRPCResponse = json.loads(line)
-                        handler(res)
-                    except json.JSONDecodeError as e:
-                        print(f"Error parsing JSON: {e}, line: {line}", file=sys.stderr)
+    def connect_args(self, channel_id: str, uri: str) -> List[str]:
+        return ["connect", "--channel_id", channel_id, "--url", self._url(uri)]
 
-            if process.stderr:
-                for line in process.stderr:
-                    print(f"CLI error: {line.strip()}", file=sys.stderr)
+    def approve_args(self, channel_id: str, chain_id: int, amount: str) -> List[str]:
+        return [
+            "approve",
+            "--channel_id",
+            channel_id,
+            "--chain_id",
+            str(chain_id),
+            "--amount",
+            amount,
+            "--private_key",
+            self._private_key,
+        ]
 
-            process.wait()
-            if process.returncode != 0:
-                print(
-                    f"CLI process exited with code {process.returncode}",
-                    file=sys.stderr,
-                )
+    def balances_args(self, channel_id: str, account: str) -> List[str]:
+        return ["balances", "--channel_id", channel_id, "--account", account]
 
-        except Exception as e:
-            print(f"Exception raised {e}", file=sys.stderr)
+    def transfer_args(self, channel_id: str, transfer: Transfer) -> List[str]:
+        return [
+            "transfer",
+            "--channel_id",
+            channel_id,
+            "--chain_id",
+            str(transfer.chain_id),
+            "--asset",
+            transfer.asset,
+            "--amount",
+            transfer.amout,
+            "--is_deposit" if transfer.is_deposit else "",
+            "--nonce",
+            transfer.nonce,
+            "--private_key",
+            self._private_key,
+        ]
 
-    def approve(self, channel_id: str, chain_id: int, amount: str):
-        subprocess.run(
-            [
-                self._cli_path,
-                "approve",
-                "--channel_id",
-                channel_id,
-                "--chain_id",
-                str(chain_id),
-                "--amount",
-                amount,
-                "--private_key",
-                self._private_key,
-            ],
-            check=True,
-            stdout=sys.stdout,
-            stderr=sys.stderr,
-            text=True,
-        )
+    def positions_args(self, channel_id: str, account: str) -> List[str]:
+        return ["positions", "--channel_id", channel_id, "--account", account]
 
-    def balances(self, channel_id: str, account: str):
-        subprocess.run(
-            [
-                self._cli_path,
-                "balances",
-                "--channel_id",
-                channel_id,
-                "--account",
-                account,
-            ],
-            check=True,
-            stdout=sys.stdout,
-            stderr=sys.stderr,
-            text=True,
-        )
-
-    def transfer(self, channel_id: str, transfer: Transfer):
-        """
-        Send a transfer request through the given channel_id.
-        The response will be readable through the channel output.
-        """
-        subprocess.run(
-            [
-                self._cli_path,
-                "transfer",
-                "--channel_id",
-                channel_id,
-                "--chain_id",
-                str(transfer.chain_id),
-                "--asset",
-                transfer.asset,
-                "--amount",
-                transfer.amout,
-                "--is_deposit",
-                "true" if transfer.is_deposit else "false",
-                "--nonce",
-                transfer.nonce,
-                "--private_key",
-                self._private_key,
-            ],
-            check=True,
-            stdout=sys.stdout,
-            stderr=sys.stderr,
-            text=True,
-        )
-
-    def positions(self, channel_id: str, account: str):
-        subprocess.run(
-            [
-                self._cli_path,
-                "positions",
-                "--channel_id",
-                channel_id,
-                "--account",
-                account,
-            ],
-            check=True,
-            stdout=sys.stdout,
-            stderr=sys.stderr,
-            text=True,
-        )
-
-    def quote(self, channel_id: str, rfq_id: str, quote: Quote):
-        """
-        Send a quote through the given channel_id.
-        The response will be readable through the channel output.
-        """
-        subprocess.run(
-            [
-                self._cli_path,
-                "quote",
-                "--channel_id",
-                channel_id,
-                "--rfq_id",
-                rfq_id,
-                "--asset_address",
-                quote.assetAddress,
-                "--chain_id",
-                str(quote.chainId),
-                "--expiry",
-                str(quote.expiry),
-                "--is_put",
-                "true" if quote.isPut else "false",
-                "--is_taker_buy",
-                "true" if quote.isTakerBuy else "false",
-                "--maker",
-                quote.maker,
-                "--nonce",
-                quote.nonce,
-                "--price",
-                quote.price,
-                "--quantity",
-                quote.quantity,
-                "--strike",
-                quote.strike,
-                "--valid_until",
-                str(quote.validUntil),
-                "--private_key",
-                self._private_key,
-            ],
-            check=True,
-            stdout=sys.stdout,
-            stderr=sys.stderr,
-            text=True,
-        )
+    def quote_args(self, channel_id: str, rfq_id: str, quote: Quote) -> List[str]:
+        return [
+            "quote",
+            "--channel_id",
+            channel_id,
+            "--rfq_id",
+            rfq_id,
+            "--asset_address",
+            quote.assetAddress,
+            "--chain_id",
+            str(quote.chainId),
+            "--expiry",
+            str(quote.expiry),
+            "--is_put" if quote.isPut else "",
+            "--is_taker_buy" if quote.isTakerBuy else "",
+            "--maker",
+            quote.maker,
+            "--nonce",
+            quote.nonce,
+            "--price",
+            quote.price,
+            quote.quantity,
+            quote.strike,
+            str(quote.validUntil),
+            "--private_key",
+            self._private_key,
+        ]

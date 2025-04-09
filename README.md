@@ -27,9 +27,8 @@ rysk_sdk = Rysk(env=env, private_key=private_key, v12_cli_path="./ryskV12")  # O
 
 ```python
 from rysk_sdk import Rysk, Env
-from models import JSONRPCResponse
 
-def response_handler(response: JSONRPCResponse):
+def response_handler(response: string):
     print(f"Received response: {response}")
     # Handle the JSON RPC response here
     # This is purposely left very generic so you can have your own implementation.
@@ -42,7 +41,7 @@ def response_handler(response: JSONRPCResponse):
 channel_id = "my-unique-channel-id"
 uri = "/ws/0x..."  # Example websocket endpoint (replace with actual asset address)
 
-rysk_sdk.connect(channel_id, uri, response_handler)
+rysk_sdk.execute(rysk_sdk.connect_args(channel_id, uri), response_handler)
 ```
 
 ### Approve USDC Spending
@@ -53,7 +52,7 @@ approval_channel_id = "approval-channel"
 chain_id = 84532
 amount = "1000000"
 
-rysk_sdk.approve(approval_channel_id, chain_id, amount)
+rysk_sdk.execute(rysk_sdk.approve_args(approval_channel_id, chain_id, amount))
 ```
 
 ### List USDC Balances
@@ -62,7 +61,7 @@ rysk_sdk.approve(approval_channel_id, chain_id, amount)
 maker_channel = "maker-channel"
 account = "0xabc"
 
-rysk_sdk.balances(maker_channel, account)
+rysk_sdk.execute(rysk_sdk.balances_args(maker_channel, account))
 ```
 
 ### Deposit / Withdraw
@@ -79,7 +78,7 @@ transfer_details = Transfer(
     nonce="some-unique-nonce",
 )
 
-rysk_sdk.transfer(maker_channel, transfer_details)
+rysk_sdk.execute(rysk_sdk.transfer_args(maker_channel, transfer_details))
 ```
 
 
@@ -89,7 +88,7 @@ rysk_sdk.transfer(maker_channel, transfer_details)
 maker_channel = "maker-channel"
 account = "0xabc"
 
-rysk_sdk.positions(maker_channel, account)
+rysk_sdk.execute(rysk_sdk.positions_args(maker_channel, account))
 ```
 
 ### Send a Quote
@@ -114,5 +113,5 @@ quote_details = Quote(
     validUntil=1678886460,
 )
 
-rysk_sdk.quote(maker_channel, request_id, quote_details)
+rysk_sdk.execute(rysk_sdk.quote_args(maker_channel, request_id, quote_details))
 ```

@@ -43,23 +43,6 @@ class Quote:
     strike: str
     validUntil: int
 
-    @staticmethod
-    def from_json(data: str) -> "Quote":
-        j = json.loads(data)
-        return Quote(
-            assetAddress=j.get("assetAddress"),
-            chainId=j.get("chainId"),
-            expiry=j.get("expiry"),
-            isPut=j.get("isPut"),
-            isTakerBuy=j.get("isTakerBuy"),
-            maker=j.get("maker"),
-            nonce=j.get("nonce"),
-            price=j.get("price"),
-            quantity=j.get("quantity"),
-            strike=j.get("strike"),
-            validUntil=j.get("validUntil"),
-        )
-
 
 @dataclass(frozen=True)
 class QuoteNotification:
@@ -88,17 +71,6 @@ class Transfer:
     chain_id: int
     is_deposit: bool
     nonce: str
-
-    @staticmethod
-    def from_json(data: str) -> "Transfer":
-        j = json.loads(data)
-        return Transfer(
-            amout=j.get("amout"),
-            asset=j.get("asset"),
-            chain_id=j.get("chain_id"),
-            is_deposit=j.get("is_deposit"),
-            nonce=j.get("nonce"),
-        )
 
 
 @dataclass(frozen=True)
