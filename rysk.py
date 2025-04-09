@@ -75,15 +75,15 @@ class Rysk:
     def connect_args(self, channel_id: str, uri: str) -> List[str]:
         return ["connect", "--channel_id", channel_id, "--url", self._url(uri)]
 
-    def approve_args(self, channel_id: str, chain_id: int, amount: str) -> List[str]:
+    def approve_args(self, chain_id: int, amount: str, rpc_url: str) -> List[str]:
         return [
             "approve",
-            "--channel_id",
-            channel_id,
             "--chain_id",
             str(chain_id),
             "--amount",
             amount,
+            "--rpc_url",
+            rpc_url,
             "--private_key",
             self._private_key,
         ]

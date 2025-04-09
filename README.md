@@ -48,11 +48,11 @@ rysk_sdk.execute(rysk_sdk.connect_args(channel_id, uri), response_handler)
 
 
 ```python
-approval_channel_id = "approval-channel"
 chain_id = 84532
 amount = "1000000"
+rpc_url= "https://rpc..."
 
-rysk_sdk.execute(rysk_sdk.approve_args(approval_channel_id, chain_id, amount))
+rysk_sdk.execute(rysk_sdk.approve_args(chain_id, amount, rpc_url))
 ```
 
 ### List USDC Balances
