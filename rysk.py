@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
-import subprocess
-import sys
-from typing import Any, Callable, List
+from subprocess import PIPE, Popen
+from typing import List
 
 from models import Quote, Transfer
 
@@ -39,43 +38,25 @@ class Rysk:
         self._cli_path = v12_cli_path
         self._private_key = private_key
 
-    def _url(self, uri: str) -> str:
+    def _url(self, uri: str):
         return f"{ENV_CONFIGS.get(self._env).base_url}{uri}"
 
     def execute(
         self,
         args: List[str] = [],
-        on_message: Callable[[str], Any] = print,
-        on_error: Callable[[str], Any] = lambda err: print(err, file=sys.stderr),
-        on_close: Callable[[int], Any] = print,
-    ) -> None:
-        process = subprocess.Popen(
+    ):
+        return Popen(
             [self._cli_path, *args],
             shell=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=PIPE,
+            stderr=PIPE,
             text=True,
         )
 
-        if process.stdout:
-            for line in process.stdout:
-                on_message(line.strip())
-
-        if process.stderr:
-            for line in process.stderr:
-                on_message(line.strip())
-
-        returncode = process.wait()
-        on_close(returncode)
-        if returncode != 0:
-            on_error(
-                subprocess.CalledProcessError(returncode, [self._cli_path, *args])
-            )
-
-    def connect_args(self, channel_id: str, uri: str) -> List[str]:
+    def connect_args(self, channel_id: str, uri: str):
         return ["connect", "--channel_id", channel_id, "--url", self._url(uri)]
 
-    def approve_args(self, chain_id: int, amount: str, rpc_url: str) -> List[str]:
+    def approve_args(self, chain_id: int, amount: str, rpc_url: str):
         return [
             "approve",
             "--chain_id",
@@ -88,10 +69,10 @@ class Rysk:
             self._private_key,
         ]
 
-    def balances_args(self, channel_id: str, account: str) -> List[str]:
+    def balances_args(self, channel_id: str, account: str):
         return ["balances", "--channel_id", channel_id, "--account", account]
 
-    def transfer_args(self, channel_id: str, transfer: Transfer) -> List[str]:
+    def transfer_args(self, channel_id: str, transfer: Transfer):
         return [
             "transfer",
             "--channel_id",
@@ -109,17 +90,17 @@ class Rysk:
             self._private_key,
         ]
 
-    def positions_args(self, channel_id: str, account: str) -> List[str]:
+    def positions_args(self, channel_id: str, account: str):
         return ["positions", "--channel_id", channel_id, "--account", account]
 
-    def quote_args(self, channel_id: str, rfq_id: str, quote: Quote) -> List[str]:
+    def quote_args(self, channel_id: str, rfq_id: str, quote: Quote):
         return [
             "quote",
             "--channel_id",
             channel_id,
             "--rfq_id",
             rfq_id,
-            "--asset_address",
+            "--asset",
             quote.assetAddress,
             "--chain_id",
             str(quote.chainId),
@@ -133,8 +114,11 @@ class Rysk:
             quote.nonce,
             "--price",
             quote.price,
+            "--quantity",
             quote.quantity,
+            "--strike",
             quote.strike,
+            "--valid_until",
             str(quote.validUntil),
             "--private_key",
             self._private_key,
