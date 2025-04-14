@@ -77,8 +77,7 @@ class Transfer:
 class JSONRPCResponse:
     jsonrpc: Literal["2.0"]
     id: str
-    method: str
-    params: Union[Dict[str, Any], List[Any], str, None]
+    result: Union[Dict[str, Any], List[Any], str, None]
 
     @staticmethod
     def from_json(data: str) -> "JSONRPCResponse":
@@ -86,8 +85,7 @@ class JSONRPCResponse:
         return JSONRPCResponse(
             jsonrpc=j.get("jsonrpc"),
             id=j.get("id"),
-            method=j.get("method"),
-            params=j.get("params"),
+            result=j.get("params"),
         )
 
 
