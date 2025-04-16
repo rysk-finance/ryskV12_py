@@ -180,8 +180,8 @@ async def process_rfqs():
     except Exception as e:
         print(e)
     finally:
-        rysk_sdk.execute(rysk_sdk.disconnect(maker_chan))
-        rysk_sdk.execute(rysk_sdk.disconnect(rfq_chan))
+        rysk_sdk.execute(rysk_sdk.disconnect_args(maker_chan))
+        rysk_sdk.execute(rysk_sdk.disconnect_args(rfq_chan))
 
 
 if __name__ == "__main__":
