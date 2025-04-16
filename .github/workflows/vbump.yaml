@@ -1,0 +1,17 @@
+name: Release on Merge
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+    

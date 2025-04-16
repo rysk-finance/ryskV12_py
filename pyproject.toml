@@ -1,13 +1,37 @@
+[project]
+name = "ryskV12"
+version = "0.0.1"
+authors = [
+  { name="thundering-silence", email="jack@rysk.finance" },
+]
+description = "Rysk V12 CLI wrapper"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: Linux",
+    "Operating System :: MacOS",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://rysk.finance"
+Repository = "https://github.com/rysk-finance/ryskV12_py"
+Issues = "https://github.com/rysk-finance/ryskV12_py/issues"
+"CLI Download" = "https://github.com/rysk-finance/ryskV12-cli/releases"
+
 [tool.poetry]
-name = "ryskv12-py"
-version = "0.1.0"
+name = "ryskV12"
+version = "1.0.2"
 description = "Python sdk to interact with Rysk v12"
-authors = ["thundering-silence <25010047+thundering-silence@users.noreply.github.com>"]
+authors = ["thundering-silence <jack@rysk.finance>"]
 license = "MIT"
 readme = "README.md"
+packages = [{include = "ryskV12"}]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 
 
 [build-system]
