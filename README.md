@@ -10,12 +10,7 @@ Python wrapper for ryskV12 cli
     poetry add ryskV12
     ```
 3.  **Download the `ryskV12` CLI:**
-    ```bash
-    ./client/scripts/fetch_latest_release.sh
-    ```
-    This automatically pulls the [latest release of `ryskV12 cli`](https://github.com/rysk-finance/ryskV12-cli/releases/latest). 
-    If that is not the case please
-    navigate to https://github.com/rysk-finance/ryskV12-cli/releases/latest and download the latest release in this directory as `ryskV12`.
+    Navigate to https://github.com/rysk-finance/ryskV12-cli/releases/latest and download the latest release in the root directory of your project as `ryskV12`.
 
 ## Run
 
@@ -25,23 +20,15 @@ Python wrapper for ryskV12 cli
 from ryskV12.client import Rysk, Env
 
 private_key = "YOUR_PRIVATE_KEY"
-env = Env.TESTNET 
-rysk_sdk = Rysk(env=env, private_key=private_key, v12_cli_path="./ryskV12")  # Optional CLI path
+env = Env.TESTNET
+rysk_sdk = Rysk(env=env, private_key=private_key, v12_cli_path="/path/to/ryskV12")  # Optional CLI path
 ```
 
 ### Create a Connection
 
 ```python
 
-async def stream_reader(stream, callback):
-    if stream and callback:
-        while True:
-            line = await stream.readline()
-            if not line:
-                break
-            callback(line)
-
-def response_handler(response: string):
+def response_handler(response: bytes):
     print(f"Received response: {response.strip()}")
 
 
@@ -49,10 +36,7 @@ channel_id = "rfqs_listener"
 uri = "/rfqs/0x..."  # Example websocket endpoint (replace with actual asset address)
 
 proc = rysk_sdk.execute_async(rysk_sdk.connect_args(channel_id, uri), response_handler)
-asyncio.run(stream_reader(proc.stdout, response_handler))
 ```
-
-
 
 ### Approve USDC Spending
 
@@ -76,7 +60,7 @@ proc = rysk_sdk.execute(rysk_sdk.balances_args(maker_channel, account))
 ### Deposit / Withdraw
 
 ```python
-from models import Transfer
+from ryskV12.models import Transfer
 
 maker_channel = "maker-channel"
 transfer_details = Transfer(
@@ -101,7 +85,7 @@ proc = rysk_sdk.execute(rysk_sdk.positions_args(maker_channel, account))
 ### Send a Quote
 
 ```python
-from models import Quote
+from ryskV12.models import Quote
 
 maker_channel = "maker-channel"
 request_id = "some-uuid-from-server"
@@ -121,7 +105,6 @@ quote_details = Quote(
 
 proc = rysk_sdk.execute(rysk_sdk.quote_args(maker_channel, request_id, quote_details))
 ```
-
 
 ## Example
 
