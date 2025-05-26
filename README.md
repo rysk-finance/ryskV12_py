@@ -150,8 +150,8 @@ async def process_rfqs():
                             result["strike"],
                             int(time.time()) + 30,
                         )
-                        proc = rysk_sdk.execute(rysk_sdk.quote_args(maker_chan, request_id, quote))
-
+                        cmd = rysk_sdk.quote_args(maker_chan, request_id, quote)
+                        proc = rysk_sdk.execute(cmd)
                         print(proc.stdout.readlines())
                         print(proc.stderr.readlines())
 
@@ -159,15 +159,20 @@ async def process_rfqs():
                 print("error")
                 print(e)
 
-        await rysk_sdk.execute_async(rysk_sdk.connect_args(rfq_chan, "rfqs/0xb67bfa7b488df4f2efa874f4e59242e9130ae61f"), process_rfq)
+        await rysk_sdk.execute_async(rysk_sdk.connect_args(rfq_chan, f"rfqs/{asset}"), process_rfq)
     except Exception as e:
         print(e)
     finally:
         rysk_sdk.execute(rysk_sdk.disconnect_args(maker_chan))
         rysk_sdk.execute(rysk_sdk.disconnect_args(rfq_chan))
 
+def handle_sig(sig, frame):
+    os.remove(f"/tmp/{asset}__py.sock")
+    os.remove("/tmp/maker__py.sock")
+    sys.exit(0)
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGINT, handle_sig)
     asyncio.run(process_rfqs())
 
 ```

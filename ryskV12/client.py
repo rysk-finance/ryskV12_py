@@ -116,7 +116,7 @@ class Rysk:
         return ["balances", "--channel_id", channel_id, "--account", account]
 
     def transfer_args(self, channel_id: str, transfer: Transfer):
-        return [
+        base = [
             "transfer",
             "--channel_id",
             channel_id,
@@ -130,14 +130,16 @@ class Rysk:
             transfer.nonce,
             "--private_key",
             self._private_key,
-            "--is_deposit" if transfer.is_deposit else "",
         ]
+        if transfer.is_deposit:
+            base.append("--is_deposit")
+        return base
 
     def positions_args(self, channel_id: str, account: str):
         return ["positions", "--channel_id", channel_id, "--account", account]
 
     def quote_args(self, channel_id: str, rfq_id: str, quote: Quote):
-        return [
+        base = [
             "quote",
             "--channel_id",
             channel_id,
@@ -148,7 +150,7 @@ class Rysk:
             "--chain_id",
             str(quote.chainId),
             "--expiry",
-            str(quote.expiry),
+            f"{quote.expiry}",
             "--maker",
             quote.maker,
             "--nonce",
@@ -163,6 +165,10 @@ class Rysk:
             str(quote.validUntil),
             "--private_key",
             self._private_key,
-            "--is_put" if quote.isPut else "",
-            "--is_taker_buy" if quote.isTakerBuy else "",
         ]
+        if quote.isPut:
+            base.append("--is_put")
+        if quote.isTakerBuy:
+            base.append("--is_taker_buy")
+        return base
+
