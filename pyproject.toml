@@ -31,7 +31,7 @@ readme = "README.md"
 packages = [{include = "ryskV12"}]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 
 
 [build-system]
