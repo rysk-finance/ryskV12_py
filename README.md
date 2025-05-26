@@ -119,6 +119,23 @@ private_key = ""
 public_address = ""
 asset = "0xb67bfa7b488df4f2efa874f4e59242e9130ae61f"
 
+def price_it(public_address: str, req: Request) -> Quote:
+    # ...your magic goes here
+    price = 4
+    return Quote(
+        req.asset,
+        req.chainId,
+        req.expiry,
+        req.isPut,
+        False,
+        public_address,
+        str(int(time.time() * 1000)),
+        f"{price}000000000000000000",
+        req.quantity,
+        req.strike,
+        int(time.time()) + 30,
+    )
+
 async def process_rfqs():
     rysk_sdk = Rysk(env=Env.TESTNET, private_key=private_key)
     maker_chan = "maker__py"
@@ -137,19 +154,16 @@ async def process_rfqs():
                     request_id = data["id"]
                     result = data["result"]
                     if is_request(result):
-                        quote = Quote(
-                            result["asset"],
-                            result["chainId"],
-                            result["expiry"],
-                            result["isPut"],
-                            False,
-                            public_address,
-                            str(int(time.time() * 1000)),
-                            "1000000000",
-                            result["quantity"],
-                            result["strike"],
-                            int(time.time()) + 30,
-                        )
+                        quote = price_it(public_address, Request(
+                            result['asset'],
+                            result['assetName'],
+                            result['chainId'],
+                            result['expiry'],
+                            result['isPut'],
+                            result['quantity'],
+                            result['strike'],
+                            result['taker'],
+                        ))
                         cmd = rysk_sdk.quote_args(maker_chan, request_id, quote)
                         proc = rysk_sdk.execute(cmd)
                         print(proc.stdout.readlines())
