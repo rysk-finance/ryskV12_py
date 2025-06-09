@@ -22,6 +22,7 @@ class EnvConfig:
 ENV_CONFIGS = {
     Env.LOCAL: EnvConfig("ws://localhost:8000/"),
     Env.TESTNET: EnvConfig("wss://rip-testnet.rysk.finance/"),
+    Env.MAINNET: EnvConfig("wss://v12.rysk.finance/")
 }
 
 
