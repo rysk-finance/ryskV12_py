@@ -13,6 +13,7 @@ class Request:
     quantity: str
     strike: str
     taker: str
+    usd: str
 
     @staticmethod
     def from_json(data: str) -> "Request":
@@ -26,6 +27,7 @@ class Request:
             quantity=j.get("quantity"),
             strike=j.get("strike"),
             taker=j.get("taker"),
+            usd=j.get("usd"),
         )
 
 
@@ -42,6 +44,7 @@ class Quote:
     quantity: str
     strike: str
     validUntil: int
+    usd: str
 
 
 @dataclass(frozen=True)
@@ -108,6 +111,7 @@ def is_request(obj: Any) -> bool:
         and isinstance(obj.get("quantity"), str)
         and isinstance(obj.get("strike"), str)
         and isinstance(obj.get("taker"), str)
+        and isinstance(obj.get("usd"), str)
     )
 
 
@@ -128,6 +132,7 @@ def is_quote(obj: Any) -> bool:
         and isinstance(obj.get("signature"), str)
         and isinstance(obj.get("strike"), str)
         and isinstance(obj.get("validUntil"), int)
+        and isinstance(obj.get("usd"), str)
     )
 
 

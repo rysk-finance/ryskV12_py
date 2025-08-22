@@ -164,6 +164,8 @@ class Rysk:
             quote.strike,
             "--valid_until",
             str(quote.validUntil),
+            "--usd",
+            quote.usd,
             "--private_key",
             self._private_key,
         ]
