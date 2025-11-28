@@ -170,6 +170,8 @@ class Rysk:
             channel_id,
             "--chain_id",
             str(transfer.chain_id),
+            "--user",
+            transfer.user,
             "--asset",
             transfer.asset,
             "--amount",
@@ -213,6 +215,8 @@ class Rysk:
             str(quote.validUntil),
             "--usd",
             quote.usd,
+            "--collateral",
+            quote.collateralAsset,
             "--private_key",
             self._private_key,
         ]

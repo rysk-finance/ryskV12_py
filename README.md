@@ -134,6 +134,8 @@ def price_it(public_address: str, req: Request) -> Quote:
         req.quantity,
         req.strike,
         int(time.time()) + 30,
+        req.usd,
+        req.collateralAsset
     )
 
 async def process_rfqs():
@@ -161,6 +163,8 @@ async def process_rfqs():
                             result['quantity'],
                             result['strike'],
                             result['taker'],
+                            result['usd'],
+                            result['collateralAsset']
                         ))
                         cmd = rysk_sdk.quote_args(maker_chan, request_id, quote)
                         proc = rysk_sdk.execute(cmd)
