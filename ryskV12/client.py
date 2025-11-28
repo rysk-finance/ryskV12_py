@@ -1,8 +1,10 @@
 import asyncio
+from asyncio import subprocess
 from dataclasses import dataclass
 from enum import Enum
 from os import path
 from subprocess import PIPE, Popen
+import sys
 from typing import List
 
 from .models import Quote, Transfer
@@ -30,6 +32,7 @@ class Rysk:
     _env: Env
     _cli_path: str
     _private_key: str
+    _min_sdk_version: str = "3.0.0"
 
     def __init__(
         self,
@@ -69,6 +72,50 @@ class Rysk:
             stderr=PIPE,
             text=True,
         )
+
+    
+    def _sdk_version_check(self):
+        def _trigger_error(self):
+            print(
+                f"{self._cli_path} version too low: min {self._min_sdk_version}.\n"
+                "Download it here https://github.com/rysk-finance/ryskV12-cli/releases/latest.",
+                file=sys.stderr
+            )
+        
+        try:
+            # subprocess.run is the modern equivalent to child_process.exec
+            result = subprocess.run(
+                [self._cli_path, "version"],
+                capture_output=True, # Captures both stdout and stderr
+                text=True,           # Decodes bytes to string automatically
+                check=False          # Don't raise exception on non-zero exit code
+            )
+        except FileNotFoundError:
+            print(f"exec error: Executable not found: {self._cli_path}", file=sys.stderr)
+            return
+        except Exception as e:
+            print(f"exec error: {e}", file=sys.stderr)
+            return
+
+        stdout = result.stdout.strip()
+        stderr = result.stderr.strip()
+
+        is_version_too_low = False
+        if stdout:
+            try:
+                current_major = float(stdout[0])
+                min_major = float(self._min_sdk_version[0])
+                is_version_too_low = current_major < min_major
+            except ValueError:
+                pass
+
+        if "No help topic for 'version'" in stderr:
+            _trigger_error()
+        elif not stdout:
+            _trigger_error()
+        elif is_version_too_low:
+            _trigger_error()
+
 
     def execute(self, args: List[str] = []):
         return Popen(

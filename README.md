@@ -142,7 +142,6 @@ async def process_rfqs():
     rfq_chan = f'{asset}__py'
     try:
         asyncio.create_task(rysk_sdk.execute_async(rysk_sdk.connect_args(maker_chan, "maker")))
-
         def process_rfq(payload: bytes):
             # print(payload)
             if payload == b'\n':
