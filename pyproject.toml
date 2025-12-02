@@ -23,7 +23,7 @@ Issues = "https://github.com/rysk-finance/ryskV12_py/issues"
 
 [tool.poetry]
 name = "ryskV12"
-version = "1.0.4"
+version = "3.0.0"
 description = "Python sdk to interact with Rysk v12"
 authors = ["thundering-silence <jack@rysk.finance>"]
 license = "MIT"
