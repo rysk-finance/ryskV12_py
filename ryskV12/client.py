@@ -43,6 +43,7 @@ class Rysk:
         self._env = env
         self._cli_path = v12_cli_path
         self._private_key = private_key
+        self._sdk_version_check()
 
     def _url(self, uri: str):
         return f"{ENV_CONFIGS.get(self._env).base_url}{uri}"
