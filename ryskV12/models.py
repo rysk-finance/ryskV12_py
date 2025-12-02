@@ -14,6 +14,7 @@ class Request:
     strike: str
     taker: str
     usd: str
+    collateralAsset: str
 
     @staticmethod
     def from_json(data: str) -> "Request":
@@ -28,6 +29,7 @@ class Request:
             strike=j.get("strike"),
             taker=j.get("taker"),
             usd=j.get("usd"),
+            collateralAsset=j.get("collateralAsset")
         )
 
 
@@ -45,6 +47,7 @@ class Quote:
     strike: str
     validUntil: int
     usd: str
+    collateralAsset: str
 
 
 @dataclass(frozen=True)
@@ -69,6 +72,7 @@ class QuoteNotification:
 
 @dataclass(frozen=True)
 class Transfer:
+    user: str
     amout: str
     asset: str
     chain_id: int
@@ -112,6 +116,7 @@ def is_request(obj: Any) -> bool:
         and isinstance(obj.get("strike"), str)
         and isinstance(obj.get("taker"), str)
         and isinstance(obj.get("usd"), str)
+        and isinstance(obj.get("collateralAsset"), str)
     )
 
 
@@ -133,6 +138,7 @@ def is_quote(obj: Any) -> bool:
         and isinstance(obj.get("strike"), str)
         and isinstance(obj.get("validUntil"), int)
         and isinstance(obj.get("usd"), str)
+        and isinstance(obj.get("collateralAsset"), str)
     )
 
 
@@ -141,6 +147,7 @@ def is_transfer(obj: Any) -> bool:
     return (
         isinstance(obj, dict)
         and obj is not None
+        and isinstance(obj.get("user"), str)
         and isinstance(obj.get("amout"), str)
         and isinstance(obj.get("asset"), str)
         and isinstance(obj.get("chain_id"), int)
